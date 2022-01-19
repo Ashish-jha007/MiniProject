@@ -1,0 +1,29 @@
+from flask import Flask,render_template,request
+import paramiko
+
+def get_server_info(command):
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    ssh.connect('54.165.87.21', port=22, username='ec2-user', timeout=3)
+    stdin, stdout, stderr = ssh.exec_command(command)
+
+    output = stdout.readlines()
+    print(output)
+    return (output,iserror)
+
+app = Flask(__name__)
+
+@app.route("/" ,methods = ['POST', 'GET'])
+def index():
+    results = None
+    if request.method == 'POST':
+        command = request.form['command']
+        results,flag = get_server_info(command)
+        return render_template("html1.html", result = results)
+    else:
+        return render_template("html1.html")
+
+if __name__ == "__main__" :
+    app.run()
